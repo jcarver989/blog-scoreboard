@@ -4,6 +4,11 @@ require 'open-uri'
 require 'sinatra'
 require 'json'
 require 'simple-rss'
+require 'yaml'
+
+
+# Public Blog Feed to Use
+BLOG = "http://dev.bizo.com/feeds/posts/default"
 
 # Points to assign to posts/comments
 POINTS = {
@@ -11,15 +16,23 @@ POINTS = {
   :comment => 1 
 }
 
+GRAVATARS = YAML.load_file("./config.yaml")["gravatars"]
+
 def parse_feed(url)
   SimpleRSS.parse open(url)
 end
 
 def format_author_name(name) 
-  author = name
-  index = name.index "http"
-  author = name[0..index-1] unless index.nil?
-  author.split(" ")[0]
+  # rss parser ends up with junk at end of name
+  # returns only the first name of author
+  author = name.gsub(/http.*/, "").gsub("noreply@blogger.com", "")
+  author.split(" ")[0].capitalize
+end
+
+
+def get_gravatar(author)
+  hash = GRAVATARS[author] || "default"
+  "https://secure.gravatar.com/avatar/#{hash}?s=140"
 end
 
 
@@ -48,6 +61,7 @@ def score_bloggers(entries)
   authors.keys.map do |author|
     data = authors[author]
     data[:author] = author
+    data[:gravatar] = get_gravatar(author)
     data[:score]  = calc_score(data[:posts], data[:comments])
     data
   end.sort { |a, b| b[:score] <=> a[:score] }
@@ -60,11 +74,8 @@ def count_comments(comments_link)
 end
 
 
-# Public Blog Feed to Use
-BLOG = "http://dev.bizo.com/feeds/posts/default"
 
 
-# Routes
 get "/scores" do 
   feed = parse_feed BLOG
   scores = score_bloggers(feed.entries)

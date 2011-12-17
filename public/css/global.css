@@ -1475,10 +1475,6 @@ body {
 .container {
   padding: 20px 40px 0; }
 
-.row {
-  margin-top: 0;
-  margin-bottom: 0; }
-
 h1 {
   font-size: 3em;
   font-weight: normal;
@@ -1506,7 +1502,25 @@ hr {
 .gradient-box.green.small, .gradient-box.blue.small {
   margin-top: 20px; }
 
-.gradient-box.green.striped, .gradient-box.blue.striped {
+.gradient-box.green.large, .gradient-box.blue.large {
   min-width: 165px; }
-  .gradient-box.green.striped h3, .gradient-box.blue.striped h3 {
+  .gradient-box.green.large h3, .gradient-box.blue.large h3 {
     font-size: 80px; }
+
+.row {
+  padding: 0 0 0 20px;
+  margin: 0; }
+
+.row.winner {
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#005390), to(#00355d));
+  background-image: -moz-linear-gradient(top, #005390, #00355d);
+  -moz-border-radius: 6px 6px 6px 6px;
+  -webkit-border-radius: 6px 6px 6px 6px;
+  border-radius: 6px 6px 6px 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  padding-top: 20px; }
+
+img.gravatar {
+  -moz-border-radius: 6px 6px 6px 6px;
+  -webkit-border-radius: 6px 6px 6px 6px;
+  border-radius: 6px 6px 6px 6px; }

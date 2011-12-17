@@ -7,38 +7,47 @@ $(document).ready ->
     $.getJSON("/scores").then(draw_leaderboard)
   ,one_minute)
 
-leader_template = (vars, opacity) -> 
+leader_template = (vars, is_winner) -> 
   """
-  <div class="row" style="opacity: #{opacity};">
-    <div class="six columns">
-      <h2 class="rank">#{vars.rank}. #{vars.name}</h2>
-    </div>
+  <div style="display: none;">
+    <div class="row #{if is_winner then "winner" else ""}">
+      <div class="three-quarters column">
+        <h2 class="rank">#{vars.rank}.</h2>
+      </div>
 
-    <div class="one-and-a-half columns">
-      <div class="#{vars.post_color} small gradient-box">
-        <h3>#{vars.post_count}</h3>
-        <small>Posts</small>
+      <div class="one-and-a-half columns">
+        <img class="gravatar" src="#{vars.gravatar}" />
+      </div>
+
+      <div class="three columns">
+        <h2>#{vars.name}</h2>
+      </div>
+
+      <div class="one-and-a-half columns">
+        <div class="#{vars.post_color} small gradient-box">
+          <h3>#{vars.post_count}</h3>
+          <small>Posts</small>
+        </div>
+      </div>
+
+      <div class="one-and-a-half columns">
+        <div class="#{vars.comment_color} small gradient-box">
+          <h3>#{vars.comment_count}</h3>
+          <small>Comments</small>
+        </div>
+      </div>
+
+
+      <div class="one-and-a-half columns">
+        <div class="#{vars.score_color} large gradient-box">
+          <h3>#{vars.score}</h3>
+          <small>Total Score</small>
+        </div>
       </div>
     </div>
-
-    <div class="one-and-a-half columns">
-      <div class="#{vars.comment_color} small gradient-box">
-        <h3>#{vars.comment_count}</h3>
-        <small>Comments</small>
-      </div>
-    </div>
-
-
-    <div class="one-and-a-half columns">
-      <div class="#{vars.score_color} striped gradient-box">
-        <h3>#{vars.score}</h3>
-        <small>Total Score</small>
-      </div>
-    </div>
+    <hr/>
   </div>
-  <hr/>
   """
-
 
 get_median = (sorted_observations) ->
   len = sorted_observations.length
@@ -55,8 +64,6 @@ get_median = (sorted_observations) ->
     sorted_observations[index]
 
 get_color = (num_items, median) ->
-  console.log median
-
   return "blue" if median == 0 || isNaN(median)
 
   if num_items > median
@@ -71,7 +78,8 @@ draw_leaderboard = (scores) ->
   container = $("#leaderBoard")
   container.html("")
 
-  html = ""
+  nodes = [] 
+  html = $("<div>")
 
   post_counts = []
   comment_counts = []
@@ -90,6 +98,7 @@ draw_leaderboard = (scores) ->
     row = {}
     row.rank = i+1
     row.name = blog_score.author
+    row.gravatar = blog_score.gravatar
 
     row.post_color = get_color(blog_score.posts, post_median)
     row.comment_color = get_color(blog_score.comments, comment_median)
@@ -99,8 +108,14 @@ draw_leaderboard = (scores) ->
     row.comment_count = blog_score.comments
     row.score = blog_score.score
 
-    opacity = "#{1-(i*0.1)}"
-    html += leader_template(row, opacity)
+    is_winner = i == 0
+    node = $(leader_template(row, is_winner))
+    nodes.push node
+    html.append node
 
-  container.append $(html)
+  container.append html
 
+  delay = 0
+  for node in nodes.slice(0).reverse()
+    node.delay(delay).slideDown(200)
+    delay += 3000
