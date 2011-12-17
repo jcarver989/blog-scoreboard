@@ -1,9 +1,9 @@
 require 'rubygems'
-require 'sinatra'
+require 'bundler/setup'
 require 'open-uri'
-require 'simple-rss'
+require 'sinatra'
 require 'json'
-
+require 'simple-rss'
 
 # Points to assign to posts/comments
 POINTS = {
