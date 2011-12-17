@@ -1496,10 +1496,10 @@ hr {
   border-top: 1px solid rgba(0, 0, 0, 0.8);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
 
-.gradient-box.green small, .gradient-box.blue small {
+.gradient-box.green small, .gradient-box.blue small, .gradient-box.gray small {
   color: white;
   text-shadow: 1px -1px rgba(0, 0, 0, 0.6); }
-.gradient-box.green.small, .gradient-box.blue.small {
+.gradient-box.green.small, .gradient-box.blue.small, .gradient-box.gray.small {
   margin-top: 20px; }
 
 .gradient-box.green.large, .gradient-box.blue.large {
