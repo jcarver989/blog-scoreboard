@@ -15,14 +15,14 @@ leader_template = (vars, opacity) ->
     </div>
 
     <div class="one-and-a-half columns">
-      <div class="#{vars.post_color} gradient-box">
+      <div class="#{vars.post_color} small gradient-box">
         <h3>#{vars.post_count}</h3>
         <small>Posts</small>
       </div>
     </div>
 
     <div class="one-and-a-half columns">
-      <div class="#{vars.comment_color} gradient-box">
+      <div class="#{vars.comment_color} small gradient-box">
         <h3>#{vars.comment_count}</h3>
         <small>Comments</small>
       </div>
@@ -36,7 +36,7 @@ leader_template = (vars, opacity) ->
       </div>
     </div>
   </div>
-  <hr />
+  <hr/>
   """
 
 

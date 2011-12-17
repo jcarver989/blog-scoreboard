@@ -8,7 +8,7 @@ $(document).ready(function() {
   }, one_minute);
 });
 leader_template = function(vars, opacity) {
-  return "<div class=\"row\" style=\"opacity: " + opacity + ";\">\n  <div class=\"six columns\">\n    <h2 class=\"rank\">" + vars.rank + ". " + vars.name + "</h2>\n  </div>\n\n  <div class=\"one-and-a-half columns\">\n    <div class=\"" + vars.post_color + " gradient-box\">\n      <h3>" + vars.post_count + "</h3>\n      <small>Posts</small>\n    </div>\n  </div>\n\n  <div class=\"one-and-a-half columns\">\n    <div class=\"" + vars.comment_color + " gradient-box\">\n      <h3>" + vars.comment_count + "</h3>\n      <small>Comments</small>\n    </div>\n  </div>\n\n\n  <div class=\"one-and-a-half columns\">\n    <div class=\"" + vars.score_color + " striped gradient-box\">\n      <h3>" + vars.score + "</h3>\n      <small>Total Score</small>\n    </div>\n  </div>\n</div>\n<hr />";
+  return "<div class=\"row\" style=\"opacity: " + opacity + ";\">\n  <div class=\"six columns\">\n    <h2 class=\"rank\">" + vars.rank + ". " + vars.name + "</h2>\n  </div>\n\n  <div class=\"one-and-a-half columns\">\n    <div class=\"" + vars.post_color + " small gradient-box\">\n      <h3>" + vars.post_count + "</h3>\n      <small>Posts</small>\n    </div>\n  </div>\n\n  <div class=\"one-and-a-half columns\">\n    <div class=\"" + vars.comment_color + " small gradient-box\">\n      <h3>" + vars.comment_count + "</h3>\n      <small>Comments</small>\n    </div>\n  </div>\n\n\n  <div class=\"one-and-a-half columns\">\n    <div class=\"" + vars.score_color + " striped gradient-box\">\n      <h3>" + vars.score + "</h3>\n      <small>Total Score</small>\n    </div>\n  </div>\n</div>\n<hr/>";
 };
 get_median = function(sorted_observations) {
   var index, len, mid1, mid2;
