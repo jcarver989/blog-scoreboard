@@ -7,8 +7,8 @@ require 'simple-rss'
 
 # Points to assign to posts/comments
 POINTS = {
-  :post => 20,
-  :comment => 10
+  :post => 10,
+  :comment => 1 
 }
 
 def parse_feed(url)

@@ -1499,3 +1499,12 @@ hr {
   border: none;
   border-top: 1px solid rgba(0, 0, 0, 0.8);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+
+.gradient-box.green small, .gradient-box.blue small {
+  color: white;
+  text-shadow: 1px -1px rgba(0, 0, 0, 0.6); }
+
+.gradient-box.green.striped, .gradient-box.blue.striped {
+  min-width: 165px; }
+  .gradient-box.green.striped h3, .gradient-box.blue.striped h3 {
+    font-size: 80px; }
