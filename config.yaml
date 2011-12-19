@@ -1,3 +1,8 @@
+# Put the url to your blogger atom/rss feed here 
+blogger_feed: "http://dev.bizo.com/feeds/posts/default"
+
+# Mapping of your blog's authors to their gravatar hashes
+# so you can display images on the scoreboard
 gravatars:
   "Josh": "21e12565aef90a7166223375428e3ea2"
   "Alex": "9d222f160cf7a214b9fa38004aa46e98"

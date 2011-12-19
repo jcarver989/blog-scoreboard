@@ -7,16 +7,15 @@ require 'simple-rss'
 require 'yaml'
 
 
-# Public Blog Feed to Use
-BLOG = "http://dev.bizo.com/feeds/posts/default"
-
 # Points to assign to posts/comments
 POINTS = {
   :post => 10,
   :comment => 1 
 }
 
-GRAVATARS = YAML.load_file("./config.yaml")["gravatars"]
+YAML_CONFIG = YAML.load_file("./config.yaml")
+BLOG        = YAML_CONFIG["blogger_feed"] 
+GRAVATARS   = YAML_CONFIG["gravatars"]
 
 def parse_feed(url)
   SimpleRSS.parse open(url)
@@ -72,8 +71,6 @@ def count_comments(comments_link)
   feed = parse_feed comments_link
   feed.entries.length
 end
-
-
 
 
 get "/scores" do 
