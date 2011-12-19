@@ -7,15 +7,17 @@ require 'simple-rss'
 require 'yaml'
 
 
-# Points to assign to posts/comments
-POINTS = {
-  :post => 10,
-  :comment => 1 
-}
+
 
 YAML_CONFIG = YAML.load_file("./config.yaml")
 BLOG        = YAML_CONFIG["blogger_feed"] 
 GRAVATARS   = YAML_CONFIG["gravatars"]
+
+# Points to assign to posts/comments
+POINTS = {
+  :post    => YAML_CONFIG["points"]["post"],
+  :comment => YAML_CONFIG["points"]["comment"]
+}
 
 def parse_feed(url)
   SimpleRSS.parse open(url)
