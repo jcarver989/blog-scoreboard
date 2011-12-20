@@ -1,14 +1,35 @@
-var add_if_missing, draw_leaderboard, get_color, get_median, leader_template;
+var add_if_missing, draw_leaderboard, get_color, get_median, leader_template, rotate_spinner;
 $(document).ready(function() {
-  var one_minute;
-  $.getJSON("/scores").then(draw_leaderboard);
+  var one_minute, spinner_id;
+  spinner_id = rotate_spinner();
+  $.getJSON("/scores").then(function(scores) {
+    return $("#loading").fadeOut(200, function() {
+      window.clearInterval(spinner_id);
+      return draw_leaderboard(scores);
+    });
+  });
   one_minute = 60000;
   return setInterval(function() {
     return $.getJSON("/scores").then(draw_leaderboard);
   }, one_minute);
 });
+rotate_spinner = function() {
+  var count, rotate;
+  count = 0;
+  rotate = function() {
+    var spinner;
+    spinner = document.getElementById('spinner');
+    spinner.style.MozTransform = 'rotate(' + count + 'deg)';
+    spinner.style.WebkitTransform = 'rotate(' + count + 'deg)';
+    if (count === 360) {
+      count = 0;
+    }
+    return count += 45;
+  };
+  return window.setInterval(rotate, 100);
+};
 leader_template = function(vars, is_winner) {
-  return "<div style=\"display: none;\">\n  <div class=\"row " + (is_winner ? "winner" : "") + "\">\n    <div class=\"three-quarters column\">\n      <h2 class=\"rank\">" + vars.rank + ".</h2>\n    </div>\n\n    <div class=\"one-and-a-half columns\">\n      <img class=\"gravatar\" src=\"" + vars.gravatar + "\" />\n    </div>\n\n    <div class=\"three columns\">\n      <h2>" + vars.name + "</h2>\n    </div>\n\n    <div class=\"one-and-a-half columns\">\n      <div class=\"" + vars.post_color + " small gradient-box\">\n        <h3>" + vars.post_count + "</h3>\n        <small>Posts</small>\n      </div>\n    </div>\n\n    <div class=\"one-and-a-half columns\">\n      <div class=\"" + vars.comment_color + " small gradient-box\">\n        <h3>" + vars.comment_count + "</h3>\n        <small>Comments</small>\n      </div>\n    </div>\n\n\n    <div class=\"one-and-a-half columns\">\n      <div class=\"" + vars.score_color + " large gradient-box\">\n        <h3>" + vars.score + "</h3>\n        <small>Total Score</small>\n      </div>\n    </div>\n  </div>\n  <hr/>\n</div>";
+  return "<div style=\"display: none\">\n  <div class=\"row " + (is_winner ? "winner" : "") + "\">\n    <div class=\"three-quarters column\">\n      <h2 class=\"rank\">" + vars.rank + ".</h2>\n    </div>\n\n    <div class=\"one-and-a-half columns\">\n      <img class=\"gravatar\" src=\"" + vars.gravatar + "\" />\n    </div>\n\n    <div class=\"three columns\">\n      <h2>" + vars.name + "</h2>\n    </div>\n\n    <div class=\"one-and-a-half columns\">\n      <div class=\"" + vars.post_color + " small gradient-box\">\n        <h3>" + vars.post_count + "</h3>\n        <small>Posts</small>\n      </div>\n    </div>\n\n    <div class=\"one-and-a-half columns\">\n      <div class=\"" + vars.comment_color + " small gradient-box\">\n        <h3>" + vars.comment_count + "</h3>\n        <small>Comments</small>\n      </div>\n    </div>\n\n\n    <div class=\"one-and-a-half columns\">\n      <div class=\"" + vars.score_color + " large gradient-box\">\n        <h3>" + vars.score + "</h3>\n        <small>Total Score</small>\n      </div>\n    </div>\n  </div>\n  <hr/>\n</div>";
 };
 get_median = function(sorted_observations) {
   var index, len, mid1, mid2;

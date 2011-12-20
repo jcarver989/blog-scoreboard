@@ -1,15 +1,36 @@
 
 $(document).ready ->
-  $.getJSON("/scores").then(draw_leaderboard)
-  one_minute = 60000 
 
+  spinner_id = rotate_spinner()
+
+  $.getJSON("/scores").then (scores) ->
+    $("#loading").fadeOut(200, () ->
+      window.clearInterval(spinner_id)
+      draw_leaderboard(scores)
+    )
+
+  one_minute = 60000
   setInterval(() ->
     $.getJSON("/scores").then(draw_leaderboard)
   ,one_minute)
 
+
+rotate_spinner = ->
+  count = 0
+
+  rotate = () ->
+    spinner = document.getElementById('spinner')
+    spinner.style.MozTransform = 'rotate('+count+'deg)'
+    spinner.style.WebkitTransform = 'rotate('+count+'deg)'
+    count = 0 if count == 360
+    count+= 45
+
+  window.setInterval(rotate, 100)
+  
+
 leader_template = (vars, is_winner) -> 
   """
-  <div style="display: none;">
+  <div style="display: none">
     <div class="row #{if is_winner then "winner" else ""}">
       <div class="three-quarters column">
         <h2 class="rank">#{vars.rank}.</h2>
