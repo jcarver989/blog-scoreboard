@@ -91,32 +91,49 @@ leader_template = (vars, is_winner) ->
   </div>
   """
 
-get_median = (sorted_observations) ->
-  len = sorted_observations.length
-  return sorted_observations[0] if len == 1
 
-  index = Math.floor(len/2)
+get_thirds = (observations) ->
+  len = observations.length
 
-  # avg middle numbers when even
-  if len % 2 == 0
-    mid1 = sorted_observations[index-1]
-    mid2 = sorted_observations[index]
-    median = (mid1 + mid2) / 2
-    median
-  else 
-    median = sorted_observations[index]
-    median
+  sorted_observations = (observation for observation in observations) 
+  sorted_observations.sort (a,b) ->
+    a - b
 
-get_color = (compare, median, color_map = {blue: "blue", red: "red", green: "green" }) ->
-  return color_map.blue if median == 0 || isNaN(median)
+  if len == 1
+    value = sorted_observations[0]
+    return {
+      low:  value
+      mid: value
+      high: value
+    }
+  else if len == 2
+    return {
+      low: sorted_observations[0]
+      mid: sorted_observations[0]
+      high: sorted_observations[1]
+    }
 
-  if compare > median
-    color_map.green 
-  else if compare == median
-    color_map.blue 
-  else
+  step_size = Math.floor(len/3)
+  low_index = step_size - 1
+  mid_index = low_index + step_size
+  high_index = mid_index + step_size
+  
+  {
+    low: sorted_observations[low_index]
+    mid: sorted_observations[mid_index]
+    high: sorted_observations[high_index]
+  }
+
+get_color = (compare, ranges, color_map = {blue: "blue", red: "red", green: "green" }) ->
+  return color_map.blue if  isNaN(ranges.mid)
+
+  if compare >= ranges.high
+    color_map.green
+  else if compare <= ranges.low
     color_map.red
-
+  else
+    color_map.blue
+  
 draw_pageviews_leaderboard = (container, scores) ->
   $("#title").text("Pageviews Leaderboard")
 
@@ -129,7 +146,7 @@ draw_pageviews_leaderboard = (container, scores) ->
 
 
   score_values = (score[1] for score in mapped_scores)
-  median = get_median(score_values) 
+  ranges = get_thirds(score_values) 
   color_map = {
     blue:  "90-#005e7d-#00a5dc",
     green: "90-#617c18-#7c9f1f",
@@ -155,7 +172,7 @@ draw_pageviews_leaderboard = (container, scores) ->
       label: score[0]
       value: score[1]
       options: {
-        bar_color: get_color(score[1], median, color_map)
+        bar_color: get_color(score[1], ranges, color_map)
       }
     }
 
@@ -176,9 +193,16 @@ draw_leaderboard = (container, scores) ->
     comment_counts.push blog_score.comments
     score_counts.push blog_score.score
 
-  post_median = get_median(post_counts)
-  comment_median = get_median(comment_counts)
-  score_median = get_median(score_counts)
+  post_ranges = get_thirds(post_counts)
+  comment_ranges = get_thirds(comment_counts)
+  score_ranges = get_thirds(score_counts)
+
+  console.log "Posts", post_ranges
+  console.log post_counts
+  console.log "Comments", comment_ranges
+  console.log comment_counts
+  console.log "Scores", score_ranges
+  console.log score_counts
 
   for blog_score, i in scores
     row = {}
@@ -186,9 +210,9 @@ draw_leaderboard = (container, scores) ->
     row.name = blog_score.author
     row.gravatar = blog_score.gravatar
 
-    row.post_color = get_color(blog_score.posts, post_median)
-    row.comment_color = get_color(blog_score.comments, comment_median)
-    row.score_color = get_color(blog_score.score, score_median)
+    row.post_color = get_color(blog_score.posts, post_ranges)
+    row.comment_color = get_color(blog_score.comments, comment_ranges)
+    row.score_color = get_color(blog_score.score, score_ranges)
 
     row.post_count = blog_score.posts
     row.comment_count = blog_score.comments

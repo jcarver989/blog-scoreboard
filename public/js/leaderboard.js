@@ -12,7 +12,7 @@ if (global.module == undefined) {
 
 
     module('Leaderboard', function(exports) {
-      var draw_leaderboard, draw_pageviews_leaderboard, get_color, get_median, leader_template, rotate_spinner;
+      var draw_leaderboard, draw_pageviews_leaderboard, get_color, get_thirds, leader_template, rotate_spinner;
 
 $(document).ready(function() {
   var container, current_screen, draw_screen, one_minute, screens, spinner_id;
@@ -62,23 +62,47 @@ leader_template = function(vars, is_winner) {
   return "<div style=\"display: none\">\n  <div class=\"row " + (is_winner ? "winner" : "") + "\">\n    <div class=\"three-quarters column\">\n      <h2 class=\"rank\">" + vars.rank + ".</h2>\n    </div>\n\n    <div class=\"one-and-a-half columns\">\n      <img class=\"gravatar\" src=\"" + vars.gravatar + "\" />\n    </div>\n\n    <div class=\"three columns\">\n      <h2>" + vars.name + "</h2>\n    </div>\n\n    <div class=\"one-and-a-half columns\">\n      <div class=\"" + vars.post_color + " small gradient-box\">\n        <h3>" + vars.post_count + "</h3>\n        <small>Posts</small>\n      </div>\n    </div>\n\n    <div class=\"one-and-a-half columns\">\n      <div class=\"" + vars.comment_color + " small gradient-box\">\n        <h3>" + vars.comment_count + "</h3>\n        <small>Comments</small>\n      </div>\n    </div>\n\n\n    <div class=\"one-and-a-half columns\">\n      <div class=\"" + vars.score_color + " large gradient-box\">\n        <h3>" + vars.score + "</h3>\n        <small>Total Score</small>\n      </div>\n    </div>\n  </div>\n  <hr/>\n</div>";
 };
 
-get_median = function(sorted_observations) {
-  var index, len, median, mid1, mid2;
-  len = sorted_observations.length;
-  if (len === 1) return sorted_observations[0];
-  index = Math.floor(len / 2);
-  if (len % 2 === 0) {
-    mid1 = sorted_observations[index - 1];
-    mid2 = sorted_observations[index];
-    median = (mid1 + mid2) / 2;
-    return median;
-  } else {
-    median = sorted_observations[index];
-    return median;
+get_thirds = function(observations) {
+  var high_index, len, low_index, mid_index, observation, sorted_observations, step_size, value;
+  len = observations.length;
+  sorted_observations = (function() {
+    var _i, _len, _results;
+    _results = [];
+    for (_i = 0, _len = observations.length; _i < _len; _i++) {
+      observation = observations[_i];
+      _results.push(observation);
+    }
+    return _results;
+  })();
+  sorted_observations.sort(function(a, b) {
+    return a - b;
+  });
+  if (len === 1) {
+    value = sorted_observations[0];
+    return {
+      low: value,
+      mid: value,
+      high: value
+    };
+  } else if (len === 2) {
+    return {
+      low: sorted_observations[0],
+      mid: sorted_observations[0],
+      high: sorted_observations[1]
+    };
   }
+  step_size = Math.floor(len / 3);
+  low_index = step_size - 1;
+  mid_index = low_index + step_size;
+  high_index = mid_index + step_size;
+  return {
+    low: sorted_observations[low_index],
+    mid: sorted_observations[mid_index],
+    high: sorted_observations[high_index]
+  };
 };
 
-get_color = function(compare, median, color_map) {
+get_color = function(compare, ranges, color_map) {
   if (color_map == null) {
     color_map = {
       blue: "blue",
@@ -86,18 +110,18 @@ get_color = function(compare, median, color_map) {
       green: "green"
     };
   }
-  if (median === 0 || isNaN(median)) return color_map.blue;
-  if (compare > median) {
+  if (isNaN(ranges.mid)) return color_map.blue;
+  if (compare >= ranges.high) {
     return color_map.green;
-  } else if (compare === median) {
-    return color_map.blue;
-  } else {
+  } else if (compare <= ranges.low) {
     return color_map.red;
+  } else {
+    return color_map.blue;
   }
 };
 
 draw_pageviews_leaderboard = function(container, scores) {
-  var author, c, color_map, graph, mapped_scores, median, pageviews, score, score_values, _i, _len;
+  var author, c, color_map, graph, mapped_scores, pageviews, ranges, score, score_values, _i, _len;
   $("#title").text("Pageviews Leaderboard");
   graph = $("<div id='barchart' style='width:" + (container.innerWidth()) + "px; height: 500px;'></div>");
   container.append(graph);
@@ -122,7 +146,7 @@ draw_pageviews_leaderboard = function(container, scores) {
     }
     return _results;
   })();
-  median = get_median(score_values);
+  ranges = get_thirds(score_values);
   color_map = {
     blue: "90-#005e7d-#00a5dc",
     green: "90-#617c18-#7c9f1f",
@@ -144,7 +168,7 @@ draw_pageviews_leaderboard = function(container, scores) {
       label: score[0],
       value: score[1],
       options: {
-        bar_color: get_color(score[1], median, color_map)
+        bar_color: get_color(score[1], ranges, color_map)
       }
     });
   }
@@ -152,7 +176,7 @@ draw_pageviews_leaderboard = function(container, scores) {
 };
 
 draw_leaderboard = function(container, scores) {
-  var blog_score, comment_counts, comment_median, delay, html, i, is_winner, node, nodes, post_counts, post_median, row, score_counts, score_median, _i, _j, _len, _len2, _len3, _ref, _results;
+  var blog_score, comment_counts, comment_ranges, delay, html, i, is_winner, node, nodes, post_counts, post_ranges, row, score_counts, score_ranges, _i, _j, _len, _len2, _len3, _ref, _results;
   $("#title").text("Blog Post Leaderboard");
   nodes = [];
   html = $("<div>");
@@ -165,18 +189,24 @@ draw_leaderboard = function(container, scores) {
     comment_counts.push(blog_score.comments);
     score_counts.push(blog_score.score);
   }
-  post_median = get_median(post_counts);
-  comment_median = get_median(comment_counts);
-  score_median = get_median(score_counts);
+  post_ranges = get_thirds(post_counts);
+  comment_ranges = get_thirds(comment_counts);
+  score_ranges = get_thirds(score_counts);
+  console.log("Posts", post_ranges);
+  console.log(post_counts);
+  console.log("Comments", comment_ranges);
+  console.log(comment_counts);
+  console.log("Scores", score_ranges);
+  console.log(score_counts);
   for (i = 0, _len2 = scores.length; i < _len2; i++) {
     blog_score = scores[i];
     row = {};
     row.rank = i + 1;
     row.name = blog_score.author;
     row.gravatar = blog_score.gravatar;
-    row.post_color = get_color(blog_score.posts, post_median);
-    row.comment_color = get_color(blog_score.comments, comment_median);
-    row.score_color = get_color(blog_score.score, score_median);
+    row.post_color = get_color(blog_score.posts, post_ranges);
+    row.comment_color = get_color(blog_score.comments, comment_ranges);
+    row.score_color = get_color(blog_score.score, score_ranges);
     row.post_count = blog_score.posts;
     row.comment_count = blog_score.comments;
     row.score = blog_score.score;
