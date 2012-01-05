@@ -81,7 +81,8 @@ def score_bloggers(entries)
 
     comments_link = entry[:"link+replies"]
     num_comments = count_comments(comments_link)
-    authors[author][:comments] = num_comments
+
+    authors[author][:comments] += num_comments
   end
 
 
@@ -111,7 +112,6 @@ def score_pageviews(posts, post_analytics)
     author_pageviews_map[author] += analytics.unique_pageviews.to_i unless analytics.nil?
   end
 
-  p author_pageviews_map
   author_pageviews_map
 end
 
