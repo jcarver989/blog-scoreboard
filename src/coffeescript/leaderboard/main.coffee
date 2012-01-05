@@ -19,7 +19,7 @@ $(document).ready ->
     $.getJSON(url).then((result) ->
       window.clearInterval(spinner_id) if clear_spinner
       $("#loading").fadeOut(200, () ->
-        $.remove("#loading")
+        $("#loading").remove()
       )
 
       container.fadeOut(200, () ->
@@ -101,9 +101,11 @@ get_median = (sorted_observations) ->
   if len % 2 == 0
     mid1 = sorted_observations[index-1]
     mid2 = sorted_observations[index]
-    (mid1 + mid2) / 2
+    median = (mid1 + mid2) / 2
+    median
   else 
-    sorted_observations[index]
+    median = sorted_observations[index]
+    median
 
 get_color = (num_items, median) ->
   return "blue" if median == 0 || isNaN(median)
@@ -112,10 +114,6 @@ get_color = (num_items, median) ->
     "green"
   else
     "blue"
-
-add_if_missing = (array, item) ->
-  array.push(item) if array.indexOf(item) == -1
-
 
 draw_pageviews_leaderboard = (container, scores) ->
   $("#title").text("Pageviews Leaderboard")
@@ -147,7 +145,6 @@ draw_pageviews_leaderboard = (container, scores) ->
 
   c.draw()
 
-
 draw_leaderboard = (container, scores) ->
   $("#title").text("Blog Post Leaderboard")
 
@@ -159,9 +156,9 @@ draw_leaderboard = (container, scores) ->
   score_counts = []
 
   for blog_score in scores
-    add_if_missing(post_counts, blog_score.posts)
-    add_if_missing(comment_counts, blog_score.comments)
-    add_if_missing(score_counts, blog_score.score)
+    post_counts.push blog_score.posts
+    comment_counts.push blog_score.comments
+    score_counts.push blog_score.score
 
   post_median = get_median(post_counts)
   comment_median = get_median(comment_counts)

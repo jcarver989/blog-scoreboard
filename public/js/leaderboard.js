@@ -12,7 +12,7 @@ if (global.module == undefined) {
 
 
     module('Leaderboard', function(exports) {
-      var add_if_missing, draw_leaderboard, draw_pageviews_leaderboard, get_color, get_median, leader_template, rotate_spinner;
+      var draw_leaderboard, draw_pageviews_leaderboard, get_color, get_median, leader_template, rotate_spinner;
 
 $(document).ready(function() {
   var container, current_screen, draw_screen, one_minute, screens, spinner_id;
@@ -29,7 +29,7 @@ $(document).ready(function() {
     return $.getJSON(url).then(function(result) {
       if (clear_spinner) window.clearInterval(spinner_id);
       $("#loading").fadeOut(200, function() {
-        return $.remove("#loading");
+        return $("#loading").remove();
       });
       container.fadeOut(200, function() {
         container.empty();
@@ -63,16 +63,18 @@ leader_template = function(vars, is_winner) {
 };
 
 get_median = function(sorted_observations) {
-  var index, len, mid1, mid2;
+  var index, len, median, mid1, mid2;
   len = sorted_observations.length;
   if (len === 1) return sorted_observations[0];
   index = Math.floor(len / 2);
   if (len % 2 === 0) {
     mid1 = sorted_observations[index - 1];
     mid2 = sorted_observations[index];
-    return (mid1 + mid2) / 2;
+    median = (mid1 + mid2) / 2;
+    return median;
   } else {
-    return sorted_observations[index];
+    median = sorted_observations[index];
+    return median;
   }
 };
 
@@ -83,10 +85,6 @@ get_color = function(num_items, median) {
   } else {
     return "blue";
   }
-};
-
-add_if_missing = function(array, item) {
-  if (array.indexOf(item) === -1) return array.push(item);
 };
 
 draw_pageviews_leaderboard = function(container, scores) {
@@ -134,9 +132,9 @@ draw_leaderboard = function(container, scores) {
   score_counts = [];
   for (_i = 0, _len = scores.length; _i < _len; _i++) {
     blog_score = scores[_i];
-    add_if_missing(post_counts, blog_score.posts);
-    add_if_missing(comment_counts, blog_score.comments);
-    add_if_missing(score_counts, blog_score.score);
+    post_counts.push(blog_score.posts);
+    comment_counts.push(blog_score.comments);
+    score_counts.push(blog_score.score);
   }
   post_median = get_median(post_counts);
   comment_median = get_median(comment_counts);
