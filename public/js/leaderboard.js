@@ -103,7 +103,7 @@ draw_pageviews_leaderboard = function(container, scores) {
   })();
   c = new Charts.BarChart('barchart', {
     bar_color: "90-#005e7d-#00a5dc",
-    bar_width: 150,
+    bar_width: 115,
     bar_margin: 20,
     y_padding: 60,
     rounding: 10,
