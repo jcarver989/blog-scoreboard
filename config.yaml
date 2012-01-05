@@ -1,6 +1,8 @@
 # Put the url to your blogger atom/rss feed here 
 blogger_feed: "http://dev.bizo.com/feeds/posts/default"
 
+# property id in Google Analytics of your Blogger Blog 
+google_analytics_property: "UA-5626189-5"
 
 points:
   "post"    : 10

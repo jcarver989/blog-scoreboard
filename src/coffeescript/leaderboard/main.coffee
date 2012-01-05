@@ -1,18 +1,39 @@
 
 $(document).ready ->
-
   spinner_id = rotate_spinner()
+  one_minute = 60000
 
-  $.getJSON("/scores").then (scores) ->
-    $("#loading").fadeOut(200, () ->
-      window.clearInterval(spinner_id)
-      draw_leaderboard(scores)
+  container = $("#leaderBoard")
+  screens = [
+    ["/scores", draw_leaderboard],
+    ["/views", draw_pageviews_leaderboard]
+  ]
+  
+  # set at end so we wrap around & start at 0
+  current_screen = 0 
+
+  draw_screen = (clear_spinner = false) ->
+    current_screen = current_screen % screens.length
+    [url, draw_func] = screens[current_screen]
+
+    $.getJSON(url).then((result) ->
+      window.clearInterval(spinner_id) if clear_spinner
+      $("#loading").fadeOut(200, () ->
+        $.remove("#loading")
+      )
+
+      container.fadeOut(200, () ->
+        container.empty()
+        container.fadeIn(200, () ->
+          draw_func(container, result)
+        )
+      )
+
+      current_screen += 1
     )
 
-  one_minute = 60000
-  setInterval(() ->
-    $.getJSON("/scores").then(draw_leaderboard)
-  ,one_minute)
+  draw_screen(true)
+  setInterval(draw_screen, one_minute)
 
 
 rotate_spinner = ->
@@ -95,9 +116,40 @@ get_color = (num_items, median) ->
 add_if_missing = (array, item) ->
   array.push(item) if array.indexOf(item) == -1
 
-draw_leaderboard = (scores) ->
-  container = $("#leaderBoard")
-  container.html("")
+
+draw_pageviews_leaderboard = (container, scores) ->
+  $("#title").text("Pageviews Leaderboard")
+
+  graph = $("<div id='barchart' style='width:#{container.innerWidth()}px; height: 500px;'></div>")
+  container.append graph
+
+  mapped_scores = ([author, pageviews] for author, pageviews of scores)
+
+  c = new Charts.BarChart('barchart', {
+    bar_color : "90-#005e7d-#00a5dc",
+    bar_width: 150
+    bar_margin: 20
+    y_padding: 60
+    rounding: 10
+
+    x_label_color: "#fff"
+    x_label_size: 30 
+
+    y_label_color: "#fff"
+    y_label_size: 30 
+  })
+
+  for score in mapped_scores
+    c.add {
+      label: score[0]
+      value: score[1]
+    }
+
+  c.draw()
+
+
+draw_leaderboard = (container, scores) ->
+  $("#title").text("Blog Post Leaderboard")
 
   nodes = [] 
   html = $("<div>")
