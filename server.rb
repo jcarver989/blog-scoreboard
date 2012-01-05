@@ -28,7 +28,7 @@ module GoogleAnalytics
   class ViewsReport
     extend Garb::Model
 
-    metrics :pageviews
+    metrics :visitors
     dimensions :page_path
   end
 
@@ -106,7 +106,7 @@ def score_pageviews(posts, post_analytics)
     # get pageviews for entry
     path = post[:"link+alternate"]
     analytics = post_analytics.detect { |analytics| path.include?(analytics.page_path) }
-    author_pageviews_map[author] += analytics.pageviews.to_i unless analytics.nil?
+    author_pageviews_map[author] += analytics.visitors.to_i unless analytics.nil?
   end
 
   p author_pageviews_map
