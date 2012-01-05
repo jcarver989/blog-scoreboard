@@ -107,15 +107,15 @@ get_median = (sorted_observations) ->
     median = sorted_observations[index]
     median
 
-get_color = (num_items, median) ->
-  return "blue" if median == 0 || isNaN(median)
+get_color = (compare, median, color_map = {blue: "blue", red: "red", green: "green" }) ->
+  return color_map.blue if median == 0 || isNaN(median)
 
-  if num_items > median
-    "green"
-  else if num_items == median
-    "blue"
+  if compare > median
+    color_map.green 
+  else if compare == median
+    color_map.blue 
   else
-    "red"
+    color_map.red
 
 draw_pageviews_leaderboard = (container, scores) ->
   $("#title").text("Pageviews Leaderboard")
@@ -128,8 +128,16 @@ draw_pageviews_leaderboard = (container, scores) ->
     b[1] - a[1]
 
 
+  score_values = (score[1] for score in mapped_scores)
+  median = get_median(score_values) 
+  color_map = {
+    blue:  "90-#005e7d-#00a5dc",
+    green: "90-#617c18-#7c9f1f",
+    red:   "90-#881313-#ae1919"
+  }
+
+
   c = new Charts.BarChart('barchart', {
-    bar_color : "90-#005e7d-#00a5dc",
     bar_width: 115
     bar_margin: 20
     y_padding: 60
@@ -146,6 +154,9 @@ draw_pageviews_leaderboard = (container, scores) ->
     c.add {
       label: score[0]
       value: score[1]
+      options: {
+        bar_color: get_color(score[1], median, color_map)
+      }
     }
 
   c.draw()

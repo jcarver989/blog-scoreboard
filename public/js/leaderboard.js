@@ -78,19 +78,26 @@ get_median = function(sorted_observations) {
   }
 };
 
-get_color = function(num_items, median) {
-  if (median === 0 || isNaN(median)) return "blue";
-  if (num_items > median) {
-    return "green";
-  } else if (num_items === median) {
-    return "blue";
+get_color = function(compare, median, color_map) {
+  if (color_map == null) {
+    color_map = {
+      blue: "blue",
+      red: "red",
+      green: "green"
+    };
+  }
+  if (median === 0 || isNaN(median)) return color_map.blue;
+  if (compare > median) {
+    return color_map.green;
+  } else if (compare === median) {
+    return color_map.blue;
   } else {
-    return "red";
+    return color_map.red;
   }
 };
 
 draw_pageviews_leaderboard = function(container, scores) {
-  var author, c, graph, mapped_scores, pageviews, score, _i, _len;
+  var author, c, color_map, graph, mapped_scores, median, pageviews, score, score_values, _i, _len;
   $("#title").text("Pageviews Leaderboard");
   graph = $("<div id='barchart' style='width:" + (container.innerWidth()) + "px; height: 500px;'></div>");
   container.append(graph);
@@ -106,8 +113,22 @@ draw_pageviews_leaderboard = function(container, scores) {
   mapped_scores.sort(function(a, b) {
     return b[1] - a[1];
   });
+  score_values = (function() {
+    var _i, _len, _results;
+    _results = [];
+    for (_i = 0, _len = mapped_scores.length; _i < _len; _i++) {
+      score = mapped_scores[_i];
+      _results.push(score[1]);
+    }
+    return _results;
+  })();
+  median = get_median(score_values);
+  color_map = {
+    blue: "90-#005e7d-#00a5dc",
+    green: "90-#617c18-#7c9f1f",
+    red: "90-#881313-#ae1919"
+  };
   c = new Charts.BarChart('barchart', {
-    bar_color: "90-#005e7d-#00a5dc",
     bar_width: 115,
     bar_margin: 20,
     y_padding: 60,
@@ -121,7 +142,10 @@ draw_pageviews_leaderboard = function(container, scores) {
     score = mapped_scores[_i];
     c.add({
       label: score[0],
-      value: score[1]
+      value: score[1],
+      options: {
+        bar_color: get_color(score[1], median, color_map)
+      }
     });
   }
   return c.draw();
