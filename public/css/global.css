@@ -1496,15 +1496,15 @@ hr {
   border-top: 1px solid rgba(0, 0, 0, 0.8);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
 
-.gradient-box.green small, .gradient-box.blue small, .gradient-box.gray small {
+.gradient-box.green small, .gradient-box.blue small, .gradient-box.red small {
   color: white;
   text-shadow: 1px -1px rgba(0, 0, 0, 0.6); }
-.gradient-box.green.small, .gradient-box.blue.small, .gradient-box.gray.small {
+.gradient-box.green.small, .gradient-box.blue.small, .gradient-box.red.small {
   margin-top: 20px; }
 
-.gradient-box.green.large, .gradient-box.blue.large {
+.gradient-box.green.large, .gradient-box.blue.large, .gradient-box.red.large {
   min-width: 165px; }
-  .gradient-box.green.large h3, .gradient-box.blue.large h3 {
+  .gradient-box.green.large h3, .gradient-box.blue.large h3, .gradient-box.red.large h3 {
     font-size: 80px; }
 
 .row {

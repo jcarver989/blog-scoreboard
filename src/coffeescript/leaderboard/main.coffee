@@ -112,8 +112,10 @@ get_color = (num_items, median) ->
 
   if num_items > median
     "green"
-  else
+  else if num_items == median
     "blue"
+  else
+    "red"
 
 draw_pageviews_leaderboard = (container, scores) ->
   $("#title").text("Pageviews Leaderboard")
@@ -122,6 +124,9 @@ draw_pageviews_leaderboard = (container, scores) ->
   container.append graph
 
   mapped_scores = ([author, pageviews] for author, pageviews of scores)
+  mapped_scores.sort (a, b) ->
+    b[1] - a[1]
+
 
   c = new Charts.BarChart('barchart', {
     bar_color : "90-#005e7d-#00a5dc",

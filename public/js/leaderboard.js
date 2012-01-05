@@ -82,8 +82,10 @@ get_color = function(num_items, median) {
   if (median === 0 || isNaN(median)) return "blue";
   if (num_items > median) {
     return "green";
-  } else {
+  } else if (num_items === median) {
     return "blue";
+  } else {
+    return "red";
   }
 };
 
@@ -101,6 +103,9 @@ draw_pageviews_leaderboard = function(container, scores) {
     }
     return _results;
   })();
+  mapped_scores.sort(function(a, b) {
+    return b[1] - a[1];
+  });
   c = new Charts.BarChart('barchart', {
     bar_color: "90-#005e7d-#00a5dc",
     bar_width: 115,
